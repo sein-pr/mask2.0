@@ -523,12 +523,11 @@ if __name__ == '__main__':
     print("MaskGuard Detection System - Starting...")
     print("="*60)
     print(f"Model loaded: models/best.onnx")
-    print(f"Server will run on: http://127.0.0.1:5000")
-    print(f"Debug mode: ON (use_reloader=False)")
+    print(f"Server running on: http://127.0.0.1:5000")
+    print(f"Debug mode: ON")
     print("="*60)
     
     try:
-        # Run with use_reloader=False to prevent camera conflicts
         app.run(debug=True, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
     except KeyboardInterrupt:
         print("\nShutting down gracefully...")
@@ -536,7 +535,6 @@ if __name__ == '__main__':
         print(f"Server error: {e}")
     finally:
         detection_active = False
-        print("Releasing camera...")
         if camera is not None:
             camera.release()
             cv2.destroyAllWindows()
