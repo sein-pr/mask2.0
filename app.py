@@ -332,7 +332,108 @@ def index():
 @app.route('/health')
 def health():
     """Health check endpoint"""
-    return jsonify({'status': 'ok', 'camera_active': camera is not None})
+    return jsonify({'status': 'ok', 'model_loaded': model is not None})
+
+@app.route('/process_frame', methods=['POST'])
+def process_frame():
+    """Process a single frame from client camera"""
+    try:
+        # Get the image data from the request
+        data = request.json
+        if not data or 'image' not in data:
+            return jsonify({'error': 'No image data provided'}), 400
+        
+        # Decode base64 image
+        image_data = data['image'].split(',')[1] if ',' in data['image'] else data['image']
+        image_bytes = base64.b64decode(image_data)
+        
+        # Convert to numpy array
+        image = Image.open(io.BytesIO(image_bytes))
+        frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        
+        # Run YOLO tracking
+        results = model.track(frame, conf=0.5, iou=0.7, persist=True, verbose=False)
+        
+        # Analyze detections
+        alert_data = analyze_detection(results)
+        
+        # Draw custom bounding boxes
+        annotated_frame = frame.copy()
+        
+        for result in results:
+            if result.boxes is not None and len(result.boxes) > 0:
+                for box in result.boxes:
+                    # Get box coordinates
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])
+                    
+                    # Get track ID
+                    track_id = None
+                    if hasattr(box, 'id') and box.id is not None:
+                        track_id = int(box.id[0])
+                    
+                    # Determine color and label based on tracked status
+                    with lock:
+                        if track_id is not None and track_id in tracked_objects:
+                            obj_info = tracked_objects[track_id]
+                            if obj_info['status'] == 'unsafe':
+                                color = (0, 0, 255)  # Red for unsafe
+                                label = f"ID:{track_id} - {obj_info['status_text']} ⚠ ALERT"
+                            else:
+                                color = (0, 255, 0)  # Green for safe
+                                label = f"ID:{track_id} - {obj_info['status_text']}"
+                        else:
+                            color = (255, 255, 0)  # Yellow
+                            label = "Detecting..."
+                    
+                    # Draw bounding box
+                    cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
+                    
+                    # Draw label background
+                    label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+                    cv2.rectangle(annotated_frame, 
+                                (x1, y1 - label_size[1] - 10), 
+                                (x1 + label_size[0], y1), 
+                                color, -1)
+                    
+                    # Draw label text
+                    cv2.putText(annotated_frame, label, 
+                              (x1, y1 - 5), 
+                              cv2.FONT_HERSHEY_SIMPLEX, 
+                              0.6, (255, 255, 255), 2)
+        
+        # Draw environment warning if > 2 people unsafe
+        if alert_data['environment_unsafe']:
+            warning_text = "⚠ ENVIRONMENT NOT SAFE ⚠"
+            text_size, _ = cv2.getTextSize(warning_text, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 3)
+            x = (annotated_frame.shape[1] - text_size[0]) // 2
+            y = 50
+            
+            # Draw warning background
+            cv2.rectangle(annotated_frame, 
+                        (x - 10, y - text_size[1] - 10), 
+                        (x + text_size[0] + 10, y + 10), 
+                        (0, 0, 255), -1)
+            
+            # Draw warning text
+            cv2.putText(annotated_frame, warning_text, 
+                      (x, y), 
+                      cv2.FONT_HERSHEY_SIMPLEX, 
+                      1.0, (255, 255, 255), 3)
+        
+        # Convert back to base64
+        _, buffer = cv2.imencode('.jpg', annotated_frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            'image': f'data:image/jpeg;base64,{img_base64}',
+            'alert_data': alert_data
+        })
+        
+    except Exception as e:
+        print(f"Error processing frame: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/video_feed')
 def video_feed():

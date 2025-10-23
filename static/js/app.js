@@ -6,13 +6,17 @@ let currentlyAlarming = false;
 let environmentUnsafe = false;
 let speechInterval = null;
 let previousUnsafeCount = 0;
+let cameraHandler = null;
 
 // DOM Elements
 const toggleBtn = document.getElementById('toggleBtn');
 const resetBtn = document.getElementById('resetBtn');
+const switchCameraBtn = document.getElementById('switchCameraBtn');
 const statusBadge = document.getElementById('statusBadge');
 const statusText = document.getElementById('statusText');
 const pausedOverlay = document.getElementById('pausedOverlay');
+const cameraErrorOverlay = document.getElementById('cameraError');
+const cameraErrorText = document.getElementById('cameraErrorText');
 const alarmSound = document.getElementById('alarmSound');
 
 // Statistics Elements
@@ -152,45 +156,166 @@ function handleEnvironmentUnsafe(isUnsafe) {
     }
 }
 
+// Initialize Camera
+async function initializeCamera() {
+    if (!isCameraSupported()) {
+        showCameraError('Camera not supported in this browser');
+        return false;
+    }
+
+    try {
+        const videoElement = document.getElementById('cameraVideo');
+        const processingCanvas = document.getElementById('processingCanvas');
+        const displayCanvas = document.getElementById('displayCanvas');
+        
+        cameraHandler = new CameraHandler(videoElement, processingCanvas);
+        await cameraHandler.start();
+        
+        // Show switch camera button on mobile
+        if (isMobile()) {
+            switchCameraBtn.style.display = 'inline-flex';
+        }
+        
+        // Start processing frames
+        cameraHandler.startProcessing((result) => {
+            if (result && result.image) {
+                // Display the processed frame
+                const img = new Image();
+                img.onload = () => {
+                    const ctx = displayCanvas.getContext('2d');
+                    displayCanvas.width = img.width;
+                    displayCanvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = result.image;
+                
+                // Handle alert data
+                if (result.alert_data) {
+                    handleAlertData(result.alert_data);
+                }
+            }
+        });
+        
+        console.log('Camera initialized successfully');
+        return true;
+        
+    } catch (error) {
+        console.error('Error initializing camera:', error);
+        showCameraError(error.message || 'Failed to access camera. Please allow camera permissions.');
+        return false;
+    }
+}
+
+function showCameraError(message) {
+    cameraErrorText.textContent = message;
+    cameraErrorOverlay.style.display = 'flex';
+}
+
+function hideCameraError() {
+    cameraErrorOverlay.style.display = 'none';
+}
+
+function handleAlertData(alertData) {
+    // Handle environment unsafe condition
+    if (alertData.environment_unsafe !== undefined) {
+        handleEnvironmentUnsafe(alertData.environment_unsafe);
+    }
+    
+    // Handle individual violations
+    if (alertData.unsafe_count !== undefined) {
+        if (alertData.unsafe_count > previousUnsafeCount && !alertData.environment_unsafe) {
+            playAlarm();
+        }
+        previousUnsafeCount = alertData.unsafe_count;
+    }
+}
+
 // Toggle Detection
 toggleBtn.addEventListener('click', async () => {
     // Enable audio on first user interaction
     enableAudio();
     
-    try {
-        const response = await fetch('/toggle_detection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    isPaused = !isPaused;
+    
+    // Update UI
+    if (isPaused) {
+        toggleBtn.innerHTML = `
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Resume Detection
+        `;
+        pausedOverlay.classList.add('active');
+        stopAlarm();
+        handleEnvironmentUnsafe(false);
         
-        const data = await response.json();
-        isPaused = data.paused;
-        
-        // Update UI
-        if (isPaused) {
-            toggleBtn.innerHTML = `
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5 3 19 12 5 21 5 3"/>
-                </svg>
-                Resume Detection
-            `;
-            pausedOverlay.classList.add('active');
-            stopAlarm(); // Stop alarm when paused
-            handleEnvironmentUnsafe(false); // Stop environment unsafe alerts
-        } else {
-            toggleBtn.innerHTML = `
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="6" y="4" width="4" height="16"/>
-                    <rect x="14" y="4" width="4" height="16"/>
-                </svg>
-                Pause Detection
-            `;
-            pausedOverlay.classList.remove('active');
+        // Stop processing
+        if (cameraHandler) {
+            cameraHandler.stopProcessing();
         }
-    } catch (error) {
-        console.error('Error toggling detection:', error);
+    } else {
+        toggleBtn.innerHTML = `
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+            Pause Detection
+        `;
+        pausedOverlay.classList.remove('active');
+        
+        // Resume processing
+        if (cameraHandler) {
+            cameraHandler.startProcessing((result) => {
+                if (result && result.image) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const displayCanvas = document.getElementById('displayCanvas');
+                        const ctx = displayCanvas.getContext('2d');
+                        displayCanvas.width = img.width;
+                        displayCanvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = result.image;
+                    
+                    if (result.alert_data) {
+                        handleAlertData(result.alert_data);
+                    }
+                }
+            });
+        }
+    }
+});
+
+// Switch Camera (mobile only)
+switchCameraBtn.addEventListener('click', async () => {
+    if (cameraHandler) {
+        try {
+            const newFacingMode = await cameraHandler.switchCamera();
+            console.log(`Switched to ${newFacingMode} camera`);
+            
+            // Resume processing if not paused
+            if (!isPaused) {
+                cameraHandler.startProcessing((result) => {
+                    if (result && result.image) {
+                        const img = new Image();
+                        img.onload = () => {
+                            const displayCanvas = document.getElementById('displayCanvas');
+                            const ctx = displayCanvas.getContext('2d');
+                            displayCanvas.width = img.width;
+                            displayCanvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                        };
+                        img.src = result.image;
+                        
+                        if (result.alert_data) {
+                            handleAlertData(result.alert_data);
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error switching camera:', error);
+        }
     }
 });
 
@@ -383,7 +508,7 @@ function initializeNavigation() {
 }
 
 // Initialize application
-function init() {
+async function init() {
     console.log('MaskGuard Detection System Initialized');
     initializeStatTransitions();
     initializeNavigation();
@@ -397,6 +522,9 @@ function init() {
     if (audioNotification) {
         audioNotification.addEventListener('click', enableAudio);
     }
+    
+    // Initialize camera
+    await initializeCamera();
     
     // Update statistics every 1 second
     setInterval(updateStatistics, 1000);

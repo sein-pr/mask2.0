@@ -79,7 +79,12 @@
                         </div>
                     </div>
                     <div class="video-container">
-                        <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Video Feed">
+                        <!-- Hidden video element for camera stream -->
+                        <video id="cameraVideo" autoplay playsinline style="display: none;"></video>
+                        <!-- Canvas for capturing and processing frames -->
+                        <canvas id="processingCanvas" style="display: none;"></canvas>
+                        <!-- Display canvas for showing results -->
+                        <canvas id="displayCanvas"></canvas>
                         <div class="video-overlay" id="pausedOverlay">
                             <div class="pause-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -89,6 +94,16 @@
                             </div>
                             <p>Detection Paused</p>
                         </div>
+                        <div class="video-overlay" id="cameraError" style="display: none;">
+                            <div class="pause-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                            <p id="cameraErrorText">Camera Error</p>
+                        </div>
                     </div>
                     <div class="controls">
                         <button id="toggleBtn" class="btn btn-primary">
@@ -97,6 +112,14 @@
                                 <rect x="14" y="4" width="4" height="16"/>
                             </svg>
                             Pause Detection
+                        </button>
+                        <button id="switchCameraBtn" class="btn btn-secondary" style="display: none;">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                                <path d="M17 8h.01"/>
+                            </svg>
+                            Switch Camera
                         </button>
                         <button id="resetBtn" class="btn btn-secondary">
                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -279,6 +302,7 @@
         <source src="{{ url_for('static', filename='sounds/beep-warning-6387.mp3') }}" type="audio/mpeg">
     </audio>
 
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
