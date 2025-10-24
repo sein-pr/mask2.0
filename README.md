@@ -23,10 +23,11 @@ MaskGuard is an intelligent real-time face mask detection system built with Flas
 
 **Key Highlights:**
 - 🤖 Powered by **Ultralytics YOLO11** pretrained models
-- 📊 Trained on a custom, high-quality dataset from **Kaggle**
+- 📊 Trained on a custom, high-quality dataset from **Kaggle** ([training notebook included](training-notebook.ipynb))
 - ☁️ Deployable on **Back4App** with automatic HTTPS
 - 🎯 Three-class detection: With Mask, Without Mask, Incorrect Mask
 - 🔄 Smart tracking with unique IDs (no duplicate counting)
+- 📈 Achieved **92% precision** and **81.3% recall** on validation set
 
 ---
 
@@ -262,6 +263,7 @@ Each person gets a **unique ID** and is counted only **once**. If they leave and
 ```
 mask2.0/
 ├── app.py                  # Main Flask application
+├── training-notebook.ipynb # Complete training notebook (Kaggle)
 ├── models/
 │   ├── best.onnx          # YOLO model (ONNX format)
 │   ├── best.pt            # YOLO model (PyTorch format)
@@ -363,47 +365,125 @@ mask2.0/
 
 ## 📝 Model Training
 
-This project includes training and validation results in the `train/` and `val/` folders.
+This project includes a complete training notebook and comprehensive training results.
 
-### Training Results (`train/`)
+### 📓 Training Notebook
+
+**File**: [`training-notebook.ipynb`](training-notebook.ipynb)
+
+The Jupyter notebook used to train the model on Kaggle with free GPU resources. The notebook includes:
+
+**Training Configuration:**
+- **Model**: YOLO11n (Ultralytics)
+- **Epochs**: 150
+- **Image Size**: 640x640
+- **Hardware**: Dual Tesla T4 GPUs (Kaggle)
+- **Dataset**: [Best Mask Detection Dataset](https://www.kaggle.com/datasets/muwanasein/bestset)
+- **Classes**: 
+  - `Mask_Worn_Correctly`
+  - `Not_Wearing_Mask`
+  - `Mask_Worn_Incorrectly`
+
+**Final Validation Metrics:**
+```
+Class                    Precision  Recall  mAP@50  mAP@50-95
+─────────────────────────────────────────────────────────────
+All Classes                  0.920   0.813   0.872      0.612
+Mask_Worn_Correctly          0.947   0.918   0.957      0.697
+Not_Wearing_Mask             0.883   0.821   0.871      0.584
+Mask_Worn_Incorrectly        0.930   0.700   0.788      0.556
+```
+
+### 📊 Training Results (`train/`)
+
 The `train/` folder contains comprehensive training outputs:
-- **Confusion Matrices** - Both raw and normalized versions showing classification performance
-- **Performance Curves** - Precision, Recall, PR, and F1-Score curves
-- **Training Metrics** - `results.png` visualizes training progress, `results.csv` contains raw data
-- **Sample Batches** - Training and validation batch images with predictions
-- **Model Weights** - Best and last checkpoints in both PyTorch (.pt) and ONNX formats
-- **Configuration** - `args.yaml` contains all training hyperparameters
 
-### Validation Results (`val/`)
-The `val/` folder contains validation-specific outputs:
-- **Confusion Matrices** - Performance on validation set
-- **Performance Curves** - Validation metrics curves
-- **Validation Batches** - Predictions vs ground truth comparisons
+**Performance Metrics:**
+- **`results.png`** - Training and validation metrics over all epochs
+- **`results.csv`** - Raw training data for custom analysis
+- **`confusion_matrix.png`** - Classification performance matrix
+- **`confusion_matrix_normalized.png`** - Normalized confusion matrix
 
-### Train Your Own Model
-Want to train a custom model? Use:
-- Ultralytics YOLOv8 or YOLOv11
-- Dataset with three classes: `with_mask`, `without_mask`, `incorrect_mask`
-- Export to ONNX format for deployment
-- Replace `models/best.onnx` with your trained model
+**Performance Curves:**
+- **`BoxP_curve.png`** - Precision curve across confidence thresholds
+- **`BoxR_curve.png`** - Recall curve across confidence thresholds
+- **`BoxPR_curve.png`** - Precision-Recall curve
+- **`BoxF1_curve.png`** - F1-Score curve
 
-Example training command:
+**Training Samples:**
+- **`train_batch*.jpg`** - Sample training batches with annotations
+- **`val_batch*_pred.jpg`** - Validation predictions
+- **`val_batch*_labels.jpg`** - Ground truth labels
+- **`labels.jpg`** - Label distribution visualization
+
+**Model Checkpoints:**
+- **`weights/best.pt`** - Best model (PyTorch format)
+- **`weights/best.onnx`** - Best model (ONNX format for deployment)
+- **`weights/last.pt`** - Last checkpoint
+
+**Configuration:**
+- **`args.yaml`** - Complete training hyperparameters
+
+### ✅ Validation Results (`val/`)
+
+Standalone validation folder with performance analysis:
+- Confusion matrices (raw and normalized)
+- All performance curves (P, R, PR, F1)
+- Validation batch predictions vs ground truth
+
+### 🔧 Train Your Own Model
+
+Want to replicate the training or use your own dataset?
+
+**Option 1: Use the Provided Notebook**
+1. Upload [`training-notebook.ipynb`](training-notebook.ipynb) to Kaggle
+2. Enable GPU (Tesla T4 or better)
+3. Update dataset paths in `data.yaml`
+4. Run all cells
+5. Download trained model from output
+
+**Option 2: Manual Training**
+
 ```python
 from ultralytics import YOLO
 
+# Load pretrained YOLO11n model
+model = YOLO('yolo11n.pt')
+
 # Train the model
-model = YOLO('yolov8n.pt')  # or yolov11n.pt
 results = model.train(
-    data='your_dataset.yaml',
-    epochs=100,
-    imgsz=640,
-    batch=16,
-    name='mask_detection'
+    data='data.yaml',       # Dataset configuration
+    epochs=150,             # Training epochs
+    imgsz=640,              # Image size
+    device=[0, 1],          # GPU devices (use [0] for single GPU)
+    batch=16,               # Batch size
+    name='mask_detection'   # Experiment name
 )
 
-# Export to ONNX
+# Validate the model
+metrics = model.val()
+
+# Export to ONNX for deployment
 model.export(format='onnx')
 ```
+
+**Dataset Configuration (`data.yaml`):**
+```yaml
+path: /path/to/dataset
+train: train/images
+val: val/images
+
+nc: 3
+names: ['Mask_Worn_Correctly', 'Not_Wearing_Mask', 'Mask_Worn_Incorrectly']
+```
+
+### 🎯 Training Tips
+
+1. **GPU Recommended**: Training on Kaggle's free Tesla T4 takes ~2-3 hours for 150 epochs
+2. **Batch Size**: Adjust based on GPU memory (16 works well for T4)
+3. **Epochs**: 150 epochs provided excellent results; monitor for early stopping
+4. **Image Size**: 640x640 balances accuracy and speed
+5. **Data Augmentation**: YOLO11 includes built-in augmentations
 
 ---
 
