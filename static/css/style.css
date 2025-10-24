@@ -759,43 +759,115 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    body {
-        padding-top: 60px;
-    }
-    
+
+/* Tablet - Show only icons (between 481px and 900px) */
+@media (max-width: 900px) and (min-width: 481px) {
     .nav-container {
         height: 60px;
-        padding: 0 1rem;
+        padding: 0 1.5rem;
     }
     
     .nav-logo {
-        font-size: 1.25rem;
+        font-size: 1.35rem;
     }
     
     .logo-icon {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.75rem;
+        height: 1.75rem;
     }
     
     .nav-links {
-        gap: 0.25rem;
+        gap: 0.5rem;
     }
     
     .nav-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
+        padding: 0.625rem;
     }
     
-    .nav-link span {
+    /* Hide text labels on tablets */
+    .nav-text {
         display: none;
     }
     
     .nav-icon {
-        width: 1rem;
-        height: 1rem;
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+/* Phone - Bottom Navbar (max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        padding-top: 0;
+        padding-bottom: 70px; /* Space for bottom navbar */
     }
     
+    /* Move navbar to bottom */
+    .navbar {
+        top: auto;
+        bottom: 0;
+        border-top: 1px solid var(--color-border);
+        border-bottom: none;
+    }
+    
+    .nav-container {
+        height: 70px;
+        padding: 0 0.5rem;
+        justify-content: center;
+    }
+    
+    /* Hide logo on bottom navbar */
+    .nav-logo {
+        display: none;
+    }
+    
+    .nav-links {
+        flex: 1;
+        justify-content: space-around;
+        gap: 0;
+        max-width: 100%;
+    }
+    
+    .nav-link {
+        flex-direction: column;
+        padding: 0.5rem 1rem;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        min-width: 70px;
+        justify-content: center;
+    }
+    
+    /* Hide text labels on phone */
+    .nav-text {
+        display: block;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    .nav-icon {
+        width: 1.375rem;
+        height: 1.375rem;
+    }
+    
+    /* Adjust audio notification for bottom navbar */
+    .audio-notification {
+        bottom: 90px; /* Above bottom navbar */
+    }
+    
+    @keyframes slideUp {
+        from {
+            bottom: -100px;
+            opacity: 0;
+        }
+        to {
+            bottom: 90px; /* Above bottom navbar */
+            opacity: 1;
+        }
+    }
+}
+
+/* General responsive styles for smaller screens */
+@media (max-width: 768px) {
     .container {
         padding: 1rem;
     }
