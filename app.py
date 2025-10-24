@@ -9,6 +9,7 @@ import numpy as np
 import base64
 import io
 from PIL import Image
+import os
 
 app = Flask(__name__)
 
@@ -519,16 +520,21 @@ def reset_statistics():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
+    # Get port from environment variable (for deployment) or use 5000 (for local)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV', 'development') != 'production'
+    
     print("="*60)
     print("MaskGuard Detection System - Starting...")
     print("="*60)
     print(f"Model loaded: models/best.onnx")
-    print(f"Server running on: http://127.0.0.1:5000")
-    print(f"Debug mode: ON")
+    print(f"Server running on: http://0.0.0.0:{port}")
+    print(f"Debug mode: {'ON' if debug else 'OFF'}")
+    print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
     print("="*60)
     
     try:
-        app.run(debug=True, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
+        app.run(debug=debug, host='0.0.0.0', port=port, threaded=True, use_reloader=False)
     except KeyboardInterrupt:
         print("\nShutting down gracefully...")
     except Exception as e:
