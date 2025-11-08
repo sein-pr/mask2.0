@@ -327,8 +327,23 @@ def generate_frames():
 
 @app.route('/')
 def index():
-    """Render main page"""
-    return render_template('index.html')
+    """Render home page"""
+    return render_template('home.html')
+
+@app.route('/live')
+def live():
+    """Render live detection page"""
+    return render_template('live.html')
+
+@app.route('/upload')
+def upload():
+    """Render upload page"""
+    return render_template('upload.html')
+
+@app.route('/how-it-works')
+def how_it_works():
+    """Render how it works page"""
+    return render_template('how_it_works.html')
 
 @app.route('/health')
 def health():
@@ -432,6 +447,136 @@ def process_frame():
         
     except Exception as e:
         print(f"Error processing frame: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/process_image', methods=['POST'])
+def process_image():
+    """Process a single uploaded image (no tracking, just detection)"""
+    try:
+        # Get the image data from the request
+        data = request.json
+        if not data or 'image' not in data:
+            return jsonify({'error': 'No image data provided'}), 400
+        
+        # Decode base64 image
+        image_data = data['image'].split(',')[1] if ',' in data['image'] else data['image']
+        image_bytes = base64.b64decode(image_data)
+        
+        # Convert to numpy array
+        image = Image.open(io.BytesIO(image_bytes))
+        frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        
+        # Run YOLO detection (NOT tracking - just detection)
+        results = model(frame, conf=0.5, verbose=False)
+        
+        # Count detections by category
+        detection_counts = {
+            'with_mask': 0,
+            'without_mask': 0,
+            'incorrect_mask': 0,
+            'total': 0
+        }
+        
+        # Draw custom bounding boxes
+        annotated_frame = frame.copy()
+        
+        for result in results:
+            if result.boxes is not None and len(result.boxes) > 0:
+                for box in result.boxes:
+                    # Get box coordinates
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])
+                    
+                    # Get class info
+                    cls_id = int(box.cls[0])
+                    conf = float(box.conf[0])
+                    class_name = result.names[cls_id].lower()
+                    
+                    # Determine status and color
+                    is_unsafe = False
+                    status_text = ""
+                    
+                    # Check negative cases first
+                    if 'no_mask' in class_name or 'without_mask' in class_name or 'not_wearing' in class_name or 'no mask' in class_name:
+                        is_unsafe = True
+                        status_text = "No Mask"
+                        color = (0, 0, 255)  # Red
+                        detection_counts['without_mask'] += 1
+                    elif 'incorrect' in class_name or 'improper' in class_name or 'mask_weared_incorrect' in class_name:
+                        is_unsafe = True
+                        status_text = "Incorrect Mask"
+                        color = (0, 165, 255)  # Orange
+                        detection_counts['incorrect_mask'] += 1
+                    elif 'mask' in class_name or 'with_mask' in class_name or 'wearing_mask' in class_name:
+                        status_text = "Mask OK"
+                        color = (0, 255, 0)  # Green
+                        detection_counts['with_mask'] += 1
+                    else:
+                        status_text = class_name
+                        color = (255, 255, 0)  # Yellow
+                    
+                    detection_counts['total'] += 1
+                    
+                    # Create label with confidence
+                    label = f"{status_text} ({conf:.2f})"
+                    if is_unsafe:
+                        label += " ⚠"
+                    
+                    # Draw bounding box
+                    cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 3)
+                    
+                    # Draw label background
+                    label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                    cv2.rectangle(annotated_frame, 
+                                (x1, y1 - label_size[1] - 15), 
+                                (x1 + label_size[0] + 10, y1), 
+                                color, -1)
+                    
+                    # Draw label text
+                    cv2.putText(annotated_frame, label, 
+                              (x1 + 5, y1 - 8), 
+                              cv2.FONT_HERSHEY_SIMPLEX, 
+                              0.7, (255, 255, 255), 2)
+        
+        # Draw summary at top if detections found
+        if detection_counts['total'] > 0:
+            unsafe_count = detection_counts['without_mask'] + detection_counts['incorrect_mask']
+            
+            if unsafe_count > 0:
+                summary_text = f"⚠ {unsafe_count} Violation(s) Detected"
+                text_color = (0, 0, 255)
+            else:
+                summary_text = f"✓ All {detection_counts['total']} Person(s) Compliant"
+                text_color = (0, 255, 0)
+            
+            text_size, _ = cv2.getTextSize(summary_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)
+            x = (annotated_frame.shape[1] - text_size[0]) // 2
+            y = 50
+            
+            # Draw background
+            cv2.rectangle(annotated_frame, 
+                        (x - 15, y - text_size[1] - 15), 
+                        (x + text_size[0] + 15, y + 10), 
+                        text_color, -1)
+            
+            # Draw text
+            cv2.putText(annotated_frame, summary_text, 
+                      (x, y), 
+                      cv2.FONT_HERSHEY_SIMPLEX, 
+                      1.2, (255, 255, 255), 3)
+        
+        # Convert back to base64
+        _, buffer = cv2.imencode('.jpg', annotated_frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            'image': f'data:image/jpeg;base64,{img_base64}',
+            'detections': detection_counts
+        })
+        
+    except Exception as e:
+        print(f"Error processing image: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500

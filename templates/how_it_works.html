@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works - MaskGuard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1 class="page-title">How It Works</h1>
+        <p class="page-subtitle">Understanding the mask detection technology</p>
+    </header>
+
+    <!-- Technology Section -->
+    <section class="info-section">
+        <div class="card">
+            <h2 class="section-title">Detection Technology</h2>
+            <div class="info-content">
+                <p class="info-text">MaskGuard uses advanced YOLO (You Only Look Once) AI model to detect and classify mask usage in real-time. The system analyzes video frames or images to identify faces and determine mask compliance status.</p>
+                
+                <div class="tech-features">
+                    <div class="tech-feature">
+                        <div class="tech-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                            </svg>
+                        </div>
+                        <h4>YOLO AI Model</h4>
+                        <p>State-of-the-art object detection for real-time processing</p>
+                    </div>
+                    <div class="tech-feature">
+                        <div class="tech-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                        </div>
+                        <h4>High Performance</h4>
+                        <p>Processes up to 10 frames per second with minimal latency</p>
+                    </div>
+                    <div class="tech-feature">
+                        <div class="tech-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <h4>Privacy First</h4>
+                        <p>All processing happens locally - no data is stored or transmitted</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detection Categories -->
+    <section class="info-section">
+        <div class="card">
+            <h2 class="section-title">Detection Categories</h2>
+            <div class="info-content">
+                <div class="categories-grid">
+                    <div class="category-card safe">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <h3>Mask Worn Correctly</h3>
+                        <p>Face mask properly covering nose and mouth</p>
+                        <div class="category-indicator">
+                            <span class="indicator-dot safe"></span>
+                            <span>Green - Safe</span>
+                        </div>
+                    </div>
+                    <div class="category-card warning">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </div>
+                        <h3>Mask Worn Incorrectly</h3>
+                        <p>Mask not covering nose or worn improperly</p>
+                        <div class="category-indicator">
+                            <span class="indicator-dot warning"></span>
+                            <span>Yellow - Warning</span>
+                        </div>
+                    </div>
+                    <div class="category-card danger">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3>No Mask Detected</h3>
+                        <p>Person not wearing any face mask</p>
+                        <div class="category-indicator">
+                            <span class="indicator-dot danger"></span>
+                            <span>Red - Alert</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Steps -->
+    <section class="info-section">
+        <div class="card">
+            <h2 class="section-title">How to Use</h2>
+            <div class="info-content">
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Choose Detection Mode</h3>
+                            <p>Select between live camera detection for real-time monitoring or upload an image for analysis.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Grant Camera Access</h3>
+                            <p>For live detection, allow camera permissions when prompted. The system works entirely in your browser.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Monitor Detections</h3>
+                            <p>Watch as the system identifies faces and classifies mask usage with color-coded bounding boxes.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Respond to Alerts</h3>
+                            <p>Audio alerts notify you of violations. If more than 2 people are non-compliant, you'll hear "Environment Not Safe".</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Track Statistics</h3>
+                            <p>View real-time compliance metrics and detection history. Reset statistics anytime with the reset button.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alert System -->
+    <section class="info-section">
+        <div class="card">
+            <h2 class="section-title">Alert System</h2>
+            <div class="info-content">
+                <div class="alert-info">
+                    <div class="alert-item">
+                        <div class="alert-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            </svg>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Audio Alerts</h4>
+                            <p>Beep sound plays when a new violation is detected</p>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Visual Warnings</h4>
+                            <p>Red bounding boxes and alert icons highlight violations</p>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Voice Announcements</h4>
+                            <p>Speech synthesis announces "Environment Not Safe" when multiple violations occur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="info-section">
+        <div class="card">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="info-content">
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <h4>Is my camera data stored or transmitted?</h4>
+                        <p>No. All processing happens locally in your browser. No images or video are stored or sent to any server.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>What browsers are supported?</h4>
+                        <p>MaskGuard works on all modern browsers including Chrome, Firefox, Safari, and Edge that support WebRTC.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Can I use this on mobile devices?</h4>
+                        <p>Yes! The system is fully responsive and works on smartphones and tablets with camera access.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>How accurate is the detection?</h4>
+                        <p>The YOLO model has been trained on thousands of images and achieves high accuracy in various lighting conditions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

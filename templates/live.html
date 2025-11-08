@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Live Detection - MaskGuard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Audio Notification Toast -->
+    <div id="audioNotification" class="audio-notification">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+        Click anywhere to enable audio alerts
+    </div>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1 class="page-title">Live Detection Feed</h1>
+        <p class="page-subtitle">Real-time mask compliance monitoring</p>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+        <!-- Video Feed Section -->
+        <div class="video-section">
+            <div class="card video-card">
+                <div class="card-header">
+                    <h2>Camera Feed</h2>
+                    <div class="status-badge" id="statusBadge">
+                        <span class="status-dot"></span>
+                        <span id="statusText">Safe</span>
+                    </div>
+                </div>
+                <div class="video-container">
+                    <video id="cameraVideo" autoplay playsinline style="display: none;"></video>
+                    <canvas id="processingCanvas" style="display: none;"></canvas>
+                    <canvas id="displayCanvas"></canvas>
+                    <div class="video-overlay" id="pausedOverlay">
+                        <div class="pause-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="6" y="4" width="4" height="16"/>
+                                <rect x="14" y="4" width="4" height="16"/>
+                            </svg>
+                        </div>
+                        <p>Detection Paused</p>
+                    </div>
+                    <div class="video-overlay" id="cameraError" style="display: none;">
+                        <div class="pause-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <p id="cameraErrorText">Camera Error</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="toggleBtn" class="btn btn-primary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="4" width="4" height="16"/>
+                            <rect x="14" y="4" width="4" height="16"/>
+                        </svg>
+                        Pause Detection
+                    </button>
+                    <button id="switchCameraBtn" class="btn btn-secondary" style="display: none;">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        Switch Camera
+                    </button>
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 4v6h6M23 20v-6h-6"/>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                        </svg>
+                        Reset Stats
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <!-- Environment Status Card -->
+            <div class="card status-card">
+                <h3 class="card-title">Environment Status</h3>
+                <div class="status-indicator" id="environmentStatus">
+                    <div class="status-icon safe" id="statusIcon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <h2 class="status-title" id="environmentText">Environment Safe</h2>
+                    <p class="status-description" id="safetyPercentage">100% Compliance</p>
+                </div>
+            </div>
+
+            <!-- Detection Statistics Card -->
+            <div class="card stats-card">
+                <h3 class="card-title">Detection Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item stat-safe">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">With Mask</p>
+                            <p class="stat-value" id="withMask">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-danger">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Without Mask</p>
+                            <p class="stat-value" id="withoutMask">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-warning">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Incorrect Mask</p>
+                            <p class="stat-value" id="incorrectMask">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-info">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                <polyline points="13 2 13 9 20 9"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Detections</p>
+                            <p class="stat-value" id="totalDetections">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Violation Card -->
+            <div class="card violation-card">
+                <h3 class="card-title">Last Violation</h3>
+                <div class="violation-content">
+                    <p id="lastViolation" class="violation-text">No violations detected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alarm Sound -->
+<audio id="alarmSound" preload="auto">
+    <source src="{{ url_for('static', filename='sounds/beep-warning-6387.mp3') }}" type="audio/mpeg">
+</audio>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

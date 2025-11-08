@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Image - MaskGuard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1 class="page-title">Upload Image for Detection</h1>
+        <p class="page-subtitle">Analyze mask compliance in your photos</p>
+    </header>
+
+    <!-- Upload Section -->
+    <div class="upload-container">
+        <div class="card upload-card">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <h3>Drop your image here</h3>
+                <p>or click to browse</p>
+                <button class="btn btn-primary" id="browseBtn">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Choose File
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-grid">
+                <!-- Original Image -->
+                <div class="card result-card">
+                    <h3 class="card-title">Original Image</h3>
+                    <div class="image-container">
+                        <img id="originalImage" alt="Original">
+                    </div>
+                </div>
+
+                <!-- Processed Image -->
+                <div class="card result-card">
+                    <h3 class="card-title">Detection Results</h3>
+                    <div class="image-container">
+                        <img id="processedImage" alt="Processed">
+                        <div class="loading-overlay" id="loadingOverlay">
+                            <div class="spinner"></div>
+                            <p>Processing image...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detection Summary -->
+            <div class="card summary-card">
+                <h3 class="card-title">Detection Summary</h3>
+                <div class="summary-content" id="summaryContent">
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <div class="summary-icon safe">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div class="summary-info">
+                                <p class="summary-label">With Mask</p>
+                                <p class="summary-value" id="summaryWithMask">0</p>
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-icon danger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                            <div class="summary-info">
+                                <p class="summary-label">Without Mask</p>
+                                <p class="summary-value" id="summaryWithoutMask">0</p>
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-icon warning">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div class="summary-info">
+                                <p class="summary-label">Incorrect Mask</p>
+                                <p class="summary-value" id="summaryIncorrectMask">0</p>
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-icon info">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div class="summary-info">
+                                <p class="summary-label">Total People</p>
+                                <p class="summary-value" id="summaryTotal">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-actions">
+                    <button class="btn btn-secondary" id="uploadAnotherBtn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Upload Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}
