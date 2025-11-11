@@ -1,619 +1,275 @@
-# 🎭 MaskGuard - Real-Time Mask Detection System
+# 🛡️ MaskGuard Detection System
 
-<div align="center">
+AI-powered real-time face mask detection and compliance monitoring system.
 
-A modern, AI-powered face mask detection web application with mobile support. Works on **phones, tablets, and desktops**!
-
-**Developed by Aina** 🚀
-
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
-[![YOLO](https://img.shields.io/badge/YOLO-v11-red.svg)](https://docs.ultralytics.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[About](#-about) • [Features](#-features) • [Showcase](#-system-showcase) • [Quick Start](#-quick-start-local) • [Deployment](#-deploy-online) • [How It Works](#-how-it-works) • [Dataset](#-dataset) • [Acknowledgments](#-acknowledgments)
-
-</div>
-
----
-
-## 📖 About
-
-MaskGuard is an intelligent real-time face mask detection system built with Flask, YOLO11, and modern web technologies. The system uses advanced object detection and tracking to monitor mask compliance in real-time, making it perfect for offices, schools, retail stores, healthcare facilities, and public spaces.
-
-**Key Highlights:**
-- 🤖 Powered by **Ultralytics YOLO11** pretrained models
-- 📊 Trained on a custom, high-quality dataset from **Kaggle** ([training notebook included](training-notebook.ipynb))
-- ☁️ Deployable on **Back4App** with automatic HTTPS
-- 🎯 Three-class detection: With Mask, Without Mask, Incorrect Mask
-- 🔄 Smart tracking with unique IDs (no duplicate counting)
-- 📈 Achieved **92% precision** and **81.3% recall** on validation set
-
----
+![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)
+![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)
+![YOLO](https://img.shields.io/badge/YOLO-v8-red.svg)
 
 ## ✨ Features
 
-- 🎥 **Real-time Detection** - Instant mask compliance monitoring
-- 📱 **Mobile & Desktop** - Works on any device with a camera
-- 🔄 **Object Tracking** - Unique IDs for each person (no duplicate counting!)
-- 🔊 **Audio Alerts** - Sound + speech warnings for violations
-- 📊 **Live Statistics** - Track compliance in real-time
-- 🎨 **Beautiful UI** - Modern, responsive design
-- 🔴 **Visual Alerts** - Color-coded bounding boxes (Green = safe, Red = alert)
-- ⚠️ **Environment Warning** - Special alert when >2 people are non-compliant
-- 📷 **Camera Switching** - Front/back camera on mobile devices
+- 🎥 **Real-time Detection** - Live camera feed with instant mask detection
+- 📸 **Image Upload** - Analyze mask compliance in photos
+- 📊 **Statistics Dashboard** - Track compliance metrics in real-time
+- 🔔 **Smart Alerts** - Audio and visual warnings for violations
+- 📱 **Fully Responsive** - Works on desktop, tablet, and mobile
+- 🎨 **Modern UI** - Dark theme with faint blue accents
 
----
+## 🚀 Quick Start
 
-## 📸 System Showcase
+### Option 1: Using Startup Script (Easiest)
 
-<div align="center">
-
-### ✅ Mask Worn Correctly
-![Mask Worn](md%20imgs/System%20snap(Mask%20Worn).png)
-
-### ❌ Mask Not Worn
-![Mask Not Worn](md%20imgs/System%20snap(Mask%20No%20Worn).png)
-
-### ⚠️ Mask Worn Incorrectly
-![Mask Worn Incorrectly](md%20imgs/System%20snap(Mask%20Worn%20Incorectly).png)
-
-</div>
-
----
-
-## 🚀 Quick Start (Local)
-
-### Option 1: Python (Recommended for Development)
-
-**1. Install Dependencies**
+**Windows:**
 ```bash
-pip install -r requirements.txt
+start.bat
 ```
 
-**2. Run the App**
+**Mac/Linux:**
 ```bash
+chmod +x start.sh
+./start.sh
+```
+
+### Option 2: Manual Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the server
 python app.py
 ```
 
-**3. Open Browser**
+### Access the Application
+
+Open your browser and go to:
 ```
 http://localhost:5000
 ```
 
-**4. Allow Camera Permissions**
-Click "Allow" when browser asks for camera access
+## 📋 Requirements
 
-### Option 2: Docker (Recommended for Deployment)
+- Python 3.7 or higher
+- Webcam (for live detection)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
-**1. Build the Docker Image**
+## 📦 Installation
+
+1. **Clone or download the project**
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Ensure model file exists:**
+   ```
+   models/best.onnx
+   ```
+
+4. **Run the application:**
+   ```bash
+   python app.py
+   ```
+
+## 🎯 Usage
+
+### Home Page
+- Overview of features
+- Quick access to all functions
+- Detection type information
+
+### Live Detection
+- Real-time camera monitoring
+- Instant mask compliance detection
+- Statistics dashboard
+- Audio/visual alerts
+
+### Upload Image
+- Drag-and-drop interface
+- Analyze photos for mask compliance
+- Side-by-side comparison
+- Detection summary
+
+### How It Works
+- Technology explanation
+- Detection categories
+- Usage instructions
+- FAQ section
+
+## 🔐 Camera Access from Other Devices
+
+Camera requires HTTPS when accessing from other devices (not localhost).
+
+### Quick HTTPS Setup:
 ```bash
-docker build -t maskguard .
+python run_https.py
 ```
 
-**2. Run the Container**
-```bash
-docker run -p 5000:5000 maskguard
+Then access from other devices:
+```
+https://YOUR_IP_ADDRESS:5000
 ```
 
-**3. Access the App**
-```
-http://localhost:5000
-```
+See [CAMERA_FIX.md](CAMERA_FIX.md) for detailed instructions.
 
-See [`docker-commands.md`](docker-commands.md) for more Docker commands and options.
+## 📱 Detection Categories
 
----
+| Category | Color | Description |
+|----------|-------|-------------|
+| ✅ Mask OK | Green | Mask worn correctly |
+| ⚠️ Incorrect Mask | Orange | Mask worn improperly |
+| ❌ No Mask | Red | No mask detected |
 
-## 🌐 Deploy Online
+## 🎨 Color Scheme
 
-### ⭐ Recommended: Back4App (Free Tier Available!)
+- **Background:** Dark blue-black gradient
+- **Primary:** Bright blue (#3b82f6)
+- **Surface:** Dark blue (#1a1f35)
+- **Text:** Light colors for contrast
+- **Accents:** Green (safe), Red (danger), Yellow (warning)
 
-**Professional cloud deployment with zero configuration**
-
-[Back4App](https://www.back4app.com/) is our recommended deployment platform for MaskGuard. It offers:
-
-- ✅ **Free Tier** - Get started at no cost
-- ✅ **Automatic HTTPS** - Secure camera access built-in
-- ✅ **Easy Deploy** - Connect your GitHub repo and deploy
-- ✅ **Scalable** - Handles traffic spikes effortlessly
-- ✅ **Global CDN** - Fast performance worldwide
-
-**Quick Deploy Steps:**
-1. Sign up for a free [Back4App](https://www.back4app.com/) account
-2. Create a new app and connect your GitHub repository
-3. Back4App automatically detects Flask and deploys
-4. Your app is live with HTTPS! 🚀
-
-For detailed step-by-step instructions, see [`BACK4APP_DEPLOYMENT.md`](BACK4APP_DEPLOYMENT.md)
-
-### Alternative Platforms
-
-The app is also compatible with other Flask hosting platforms like Heroku, Railway, Render, or any cloud platform that supports Python/Flask applications.
-
----
-
-## 📱 How It Works
-
-### Client-Side Camera (JavaScript + WebRTC)
-1. Browser requests camera access via WebRTC API
-2. JavaScript captures video frames at 10 FPS
-3. Frames are encoded to base64 and sent to server via POST request
-4. Annotated frames returned and displayed in real-time
-
-### Server-Side Processing (Flask + YOLO)
-1. Flask receives base64-encoded frames at `/process_frame` endpoint
-2. YOLO model performs object detection and tracking with unique IDs
-3. Each person is assigned a persistent track ID
-4. Custom bounding boxes drawn with color-coding:
-   - **Green** = Wearing mask correctly
-   - **Red** = No mask or incorrect mask (triggers alert)
-5. Statistics updated (each person counted only once)
-6. Annotated frame returned to client
-
-### Detection Classes
-- ✅ **With Mask** - Wearing correctly (Green box, no alert)
-- ❌ **Without Mask** - Not wearing (Red box + Alert sound)
-- ⚠️ **Incorrect Mask** - Wearing improperly (Red box + Alert sound)
-
-### Smart Tracking
-- Each person gets a **unique track ID** that persists across frames
-- People are counted only **once** when first detected
-- If someone puts on a mask, their status updates without duplicate counting
-- Environment alert triggered when >2 people are non-compliant
-
----
-
-## 🔌 API Endpoints
-
-The Flask backend provides several API endpoints:
-
-### `GET /`
-Main page - serves the web interface
-
-### `POST /process_frame`
-Process a single frame from client camera
-- **Input**: JSON with base64-encoded image
-- **Output**: Annotated image and alert data
-
-### `GET /video_feed`
-Server-side camera stream (for local deployment with webcam)
-- **Output**: MJPEG stream with real-time detection
-
-### `GET /statistics`
-Get current detection statistics
-- **Output**: JSON with counts, percentages, and history
-
-### `POST /reset_statistics`
-Reset all statistics and tracking data
-- **Output**: Success confirmation
-
-### `POST /toggle_detection`
-Pause/resume detection
-- **Output**: Current pause state
-
-### `GET /health`
-Health check endpoint
-- **Output**: Server status and model load status
-
----
-
-## 🎮 Usage Guide
-
-### Desktop
-1. Visit the app URL
-2. Allow camera access
-3. See real-time detection!
-
-### Mobile
-1. Visit the app URL on your phone
-2. Allow camera access
-3. Use "Switch Camera" button to toggle front/back
-4. Works just like desktop!
-
-### Controls
-- **Pause/Resume** - Stop/start detection
-- **Switch Camera** - Toggle between cameras (mobile)
-- **Reset Statistics** - Clear all counts
-
----
-
-## 📊 Statistics
-
-### What's Tracked:
-- **Total Detections** - Unique people detected
-- **With Mask** - People wearing masks correctly
-- **Without Mask** - People not wearing masks
-- **Incorrect Mask** - People wearing masks improperly
-- **Safety Percentage** - Overall compliance rate
-
-### Unique Counting:
-Each person gets a **unique ID** and is counted only **once**. If they leave and return, they won't be counted again!
-
----
-
-## 🔊 Alert System
-
-### Individual Alerts
-- Sound plays **once** when someone without proper mask is detected
-- Red bounding box with "ALERT" label
-- Continues until they put mask on correctly
-
-### Environment Unsafe (>2 people)
-- Continuous beeping sound
-- Voice alert: "Environment not safe"
-- Large warning banner on screen
-- Repeats until situation improves
-
----
-
-## 🛠️ Tech Stack
-
-- **Backend**: Flask
-- **AI Model**: Ultralytics YOLO (ONNX format)
-- **Computer Vision**: OpenCV
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Camera**: Browser WebRTC API
-- **Audio**: Web Audio API + Speech Synthesis API
-
----
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
-mask2.0/
-├── app.py                  # Main Flask application
-├── training-notebook.ipynb # Complete training notebook (Kaggle)
-├── models/
-│   ├── best.onnx          # YOLO model (ONNX format)
-│   ├── best.pt            # YOLO model (PyTorch format)
-│   └── last.pt            # Last checkpoint
-├── train/                  # Training results
-│   ├── weights/           # Model weights
-│   │   ├── best.pt
-│   │   ├── best.onnx
-│   │   └── last.pt
-│   ├── confusion_matrix.png
-│   ├── confusion_matrix_normalized.png
-│   ├── results.png        # Training metrics graphs
-│   ├── results.csv        # Training metrics data
-│   ├── BoxP_curve.png     # Precision curve
-│   ├── BoxR_curve.png     # Recall curve
-│   ├── BoxPR_curve.png    # Precision-Recall curve
-│   ├── BoxF1_curve.png    # F1-Score curve
-│   ├── train_batch*.jpg   # Training batch samples
-│   ├── val_batch*.jpg     # Validation batch predictions/labels
-│   ├── labels.jpg         # Label distribution
-│   └── args.yaml          # Training arguments
-├── val/                    # Validation results
-│   ├── confusion_matrix.png
-│   ├── confusion_matrix_normalized.png
-│   ├── BoxP_curve.png     # Precision curve
-│   ├── BoxR_curve.png     # Recall curve
-│   ├── BoxPR_curve.png    # Precision-Recall curve
-│   ├── BoxF1_curve.png    # F1-Score curve
-│   └── val_batch*.jpg     # Validation predictions/labels
-├── static/
+maskguard/
+├── app.py                      # Main Flask application
+├── requirements.txt            # Python dependencies
+├── start.bat / start.sh       # Startup scripts
+├── run_https.py               # HTTPS server script
+├── templates/                 # HTML templates
+│   ├── base.html             # Base template
+│   ├── home.html             # Home page
+│   ├── live.html             # Live detection
+│   ├── upload.html           # Image upload
+│   └── how_it_works.html     # Information page
+├── static/                    # Static files
 │   ├── css/
-│   │   └── style.css      # Styling
+│   │   └── style.css         # Styles
 │   ├── js/
-│   │   ├── app.js         # Main JavaScript
-│   │   └── camera.js      # Camera handler
+│   │   ├── app.js            # Live detection logic
+│   │   ├── camera.js         # Camera handling
+│   │   ├── navigation.js     # Navigation menu
+│   │   └── upload.js         # Upload functionality
 │   └── sounds/
-│       └── beep-warning-6387.mp3
-├── templates/
-│   └── index.html         # Main page
-├── requirements.txt        # Python dependencies
-├── Dockerfile              # Docker configuration
-├── BACK4APP_DEPLOYMENT.md  # Back4App deployment guide
-├── QUICKSTART.md           # Quick start guide
-├── docker-commands.md      # Docker commands reference
-└── README.md              # This file
+│       └── beep-warning-6387.mp3  # Alert sound
+└── models/
+    └── best.onnx             # YOLO model
 ```
-
----
-
-## 🎯 Use Cases
-
-- 🏢 **Office Buildings** - Monitor mask compliance
-- 🏫 **Schools** - Ensure student safety
-- 🏪 **Retail Stores** - Track customer compliance
-- 🏥 **Healthcare** - Patient and visitor monitoring
-- 🎭 **Events** - Large gathering safety
-- 📚 **Research** - COVID-19 compliance studies
-
----
 
 ## 🔧 Troubleshooting
 
+### "Not Found" Error
+1. Make sure server is running (`python app.py`)
+2. Use correct URL: `http://localhost:5000`
+3. Restart the server (Ctrl+C, then `python app.py`)
+
 ### Camera Not Working
-- **Browser**: Check camera permissions in browser settings
-- **Multiple Apps**: Close other apps using camera
-- **HTTPS**: Camera requires HTTPS (works automatically when deployed)
+- **On localhost:** Should work with HTTP
+- **On other devices:** Requires HTTPS (see CAMERA_FIX.md)
 
-### Slow Performance
-- **Connection**: Check internet speed
-- **Device**: Try on a more powerful device
-- **Browser**: Use Chrome/Edge for best performance
+### Port Already in Use
+```bash
+# Windows
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
 
-### No Detections
-- **Lighting**: Ensure good lighting
-- **Distance**: Face should be visible and clear
-- **Model**: Verify model file exists at `models/best.onnx`
-
----
-
-## 📦 Requirements
-
-- Python 3.8+
-- Webcam/Camera
-- Modern browser (Chrome, Firefox, Safari, Edge)
-- YOLO model trained on mask detection
-
----
-
-## 🌍 Browser Compatibility
-
-| Browser | Desktop | Mobile |
-|---------|---------|--------|
-| Chrome  | ✅ | ✅ |
-| Safari  | ✅ | ✅ |
-| Firefox | ✅ | ✅ |
-| Edge    | ✅ | ✅ |
-
----
-
-## 📝 Model Training
-
-This project includes a complete training notebook and comprehensive training results.
-
-### 📓 Training Notebook
-
-**File**: [`training-notebook.ipynb`](training-notebook.ipynb)
-
-The Jupyter notebook used to train the model on Kaggle with free GPU resources. The notebook includes:
-
-**Training Configuration:**
-- **Model**: YOLO11n (Ultralytics)
-- **Epochs**: 150
-- **Image Size**: 640x640
-- **Hardware**: Dual Tesla T4 GPUs (Kaggle)
-- **Dataset**: [Best Mask Detection Dataset](https://www.kaggle.com/datasets/muwanasein/bestset)
-- **Classes**: 
-  - `Mask_Worn_Correctly`
-  - `Not_Wearing_Mask`
-  - `Mask_Worn_Incorrectly`
-
-**Final Validation Metrics:**
-```
-Class                    Precision  Recall  mAP@50  mAP@50-95
-─────────────────────────────────────────────────────────────
-All Classes                  0.920   0.813   0.872      0.612
-Mask_Worn_Correctly          0.947   0.918   0.957      0.697
-Not_Wearing_Mask             0.883   0.821   0.871      0.584
-Mask_Worn_Incorrectly        0.930   0.700   0.788      0.556
+# Mac/Linux
+lsof -ti:5000 | xargs kill -9
 ```
 
-### 📊 Training Results (`train/`)
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more help.
 
-The `train/` folder contains comprehensive training outputs:
+## 📚 Documentation
 
-**Performance Metrics:**
-- **`results.png`** - Training and validation metrics over all epochs
-- **`results.csv`** - Raw training data for custom analysis
-- **`confusion_matrix.png`** - Classification performance matrix
-- **`confusion_matrix_normalized.png`** - Normalized confusion matrix
+- [START_SERVER.md](START_SERVER.md) - Server startup guide
+- [CAMERA_FIX.md](CAMERA_FIX.md) - Camera access solutions
+- [HTTPS_SETUP.md](HTTPS_SETUP.md) - Detailed HTTPS setup
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and fixes
+- [UPDATES.md](UPDATES.md) - Recent changes
 
-**Performance Curves:**
-- **`BoxP_curve.png`** - Precision curve across confidence thresholds
-- **`BoxR_curve.png`** - Recall curve across confidence thresholds
-- **`BoxPR_curve.png`** - Precision-Recall curve
-- **`BoxF1_curve.png`** - F1-Score curve
+## 🛠️ Technology Stack
 
-**Training Samples:**
-- **`train_batch*.jpg`** - Sample training batches with annotations
-- **`val_batch*_pred.jpg`** - Validation predictions
-- **`val_batch*_labels.jpg`** - Ground truth labels
-- **`labels.jpg`** - Label distribution visualization
+- **Backend:** Flask (Python)
+- **AI Model:** YOLO v8 (Ultralytics)
+- **Computer Vision:** OpenCV
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Camera:** WebRTC (getUserMedia API)
 
-**Model Checkpoints:**
-- **`weights/best.pt`** - Best model (PyTorch format)
-- **`weights/best.onnx`** - Best model (ONNX format for deployment)
-- **`weights/last.pt`** - Last checkpoint
+## 🌐 Browser Support
 
-**Configuration:**
-- **`args.yaml`** - Complete training hyperparameters
+| Browser | Version | Camera Support |
+|---------|---------|----------------|
+| Chrome | 53+ | ✅ Full |
+| Firefox | 36+ | ✅ Full |
+| Safari | 11+ | ✅ Full |
+| Edge | 79+ | ✅ Full |
 
-### ✅ Validation Results (`val/`)
+## 📊 API Endpoints
 
-Standalone validation folder with performance analysis:
-- Confusion matrices (raw and normalized)
-- All performance curves (P, R, PR, F1)
-- Validation batch predictions vs ground truth
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Home page |
+| `/live` | GET | Live detection page |
+| `/upload` | GET | Upload page |
+| `/how-it-works` | GET | Information page |
+| `/process_frame` | POST | Process live camera frame |
+| `/process_image` | POST | Process uploaded image |
+| `/statistics` | GET | Get detection statistics |
+| `/reset_statistics` | POST | Reset statistics |
+| `/video_feed` | GET | Video stream endpoint |
 
-### 🔧 Train Your Own Model
+## 🔒 Security Notes
 
-Want to replicate the training or use your own dataset?
+- Camera access requires user permission
+- All processing happens locally (no data sent to external servers)
+- HTTPS recommended for production use
+- Self-signed certificates safe for local development
 
-**Option 1: Use the Provided Notebook**
-1. Upload [`training-notebook.ipynb`](training-notebook.ipynb) to Kaggle
-2. Enable GPU (Tesla T4 or better)
-3. Update dataset paths in `data.yaml`
-4. Run all cells
-5. Download trained model from output
+## 🎓 How It Works
 
-**Option 2: Manual Training**
-
-```python
-from ultralytics import YOLO
-
-# Load pretrained YOLO11n model
-model = YOLO('yolo11n.pt')
-
-# Train the model
-results = model.train(
-    data='data.yaml',       # Dataset configuration
-    epochs=150,             # Training epochs
-    imgsz=640,              # Image size
-    device=[0, 1],          # GPU devices (use [0] for single GPU)
-    batch=16,               # Batch size
-    name='mask_detection'   # Experiment name
-)
-
-# Validate the model
-metrics = model.val()
-
-# Export to ONNX for deployment
-model.export(format='onnx')
-```
-
-**Dataset Configuration (`data.yaml`):**
-```yaml
-path: /path/to/dataset
-train: train/images
-val: val/images
-
-nc: 3
-names: ['Mask_Worn_Correctly', 'Not_Wearing_Mask', 'Mask_Worn_Incorrectly']
-```
-
-### 🎯 Training Tips
-
-1. **GPU Recommended**: Training on Kaggle's free Tesla T4 takes ~2-3 hours for 150 epochs
-2. **Batch Size**: Adjust based on GPU memory (16 works well for T4)
-3. **Epochs**: 150 epochs provided excellent results; monitor for early stopping
-4. **Image Size**: 640x640 balances accuracy and speed
-5. **Data Augmentation**: YOLO11 includes built-in augmentations
-
----
-
-## 📊 Dataset
-
-This project uses a custom mask detection dataset prepared and cleaned by **Sein Muwana**.
-
-### Dataset Information
-- **Name**: Best Mask Detection Dataset
-- **Classes**: 3 (with_mask, without_mask, incorrect_mask)
-- **Platform**: Kaggle
-- **Link**: [Download Dataset on Kaggle](https://www.kaggle.com/datasets/muwanasein/bestset)
-
-The dataset has been carefully curated and annotated to ensure high-quality training data for mask detection models. It includes diverse scenarios with various lighting conditions, angles, and mask types.
-
-### Dataset Statistics
-- **Training Images**: Comprehensive collection covering all three classes
-- **Validation Images**: Balanced validation set for model evaluation
-- **Annotations**: High-quality bounding box annotations
-- **Format**: YOLO format (ready to use)
-
----
-
-## 🎨 Customization
-
-### Change Detection Confidence
-In `app.py`, modify the confidence threshold (default is 0.5):
-```python
-results = model.track(frame, conf=0.5, iou=0.7, persist=True, verbose=False)
-# Change conf=0.5 to your desired value (higher = stricter, lower = more detections)
-```
-
-### Change FPS
-In `static/js/camera.js`, adjust frame processing rate:
-```javascript
-this.fps = 10;  // Frames per second (default: 10)
-```
-
-### Change Alert Threshold
-In `app.py`, modify the environment unsafe threshold (default is >2 people):
-```python
-'environment_unsafe': unsafe_count > 2  # Change 2 to your threshold
-```
-
-### Change IOU Threshold
-In `app.py`, adjust tracking sensitivity:
-```python
-results = model.track(frame, conf=0.5, iou=0.7, persist=True, verbose=False)
-# Change iou=0.7 to control object tracking overlap threshold
-```
-
----
+1. **Capture:** Camera feed or uploaded image
+2. **Detect:** YOLO model identifies faces
+3. **Classify:** Determines mask status (OK/Incorrect/None)
+4. **Alert:** Visual and audio notifications for violations
+5. **Track:** Statistics and compliance metrics
 
 ## 🤝 Contributing
 
-Feel free to fork and improve! Some ideas:
-- [ ] Add database for statistics
-- [ ] Multi-language support
-- [ ] Dark mode theme
-- [ ] Export statistics to CSV
-- [ ] Email alerts
-- [ ] Integration with access control systems
-
----
+Developed by **Aina**
 
 ## 📄 License
 
-This project is for educational and safety purposes.
+All Rights Reserved © 2025
+
+## 🆘 Support
+
+Having issues? Check these resources:
+
+1. [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common problems
+2. [START_SERVER.md](START_SERVER.md) - Startup help
+3. [CAMERA_FIX.md](CAMERA_FIX.md) - Camera issues
+
+## 🎉 Quick Test
+
+```bash
+# 1. Start server
+python app.py
+
+# 2. Open browser
+http://localhost:5000
+
+# 3. Test routes
+python test_routes.py
+```
+
+## 📝 Notes
+
+- Model file (`models/best.onnx`) required for detection
+- Camera works on localhost without HTTPS
+- Other devices require HTTPS for camera access
+- Audio alerts require user interaction to enable
 
 ---
 
-## 👨‍💻 Developer
-
-**Developed by Aina**
-
-- AI-powered mask detection
-- Real-time object tracking
-- Mobile-first design
-- Production-ready code
-
----
-
-## 🙏 Acknowledgments
-
-This project wouldn't be possible without the contributions and support from amazing teams and individuals:
-
-<div align="center">
-
-### 🤖 AI & Model
-
-<table>
-<tr>
-<td align="center" width="50%">
-<img src="md%20imgs/thanks%20ultralytics.svg" width="120" style="border-radius: 50%;" alt="Ultralytics"/><br />
-<b><a href="https://docs.ultralytics.com/">Ultralytics Team</a></b><br/>
-<sub>For their outstanding YOLO models and the Ultralytics framework that powers our detection system. Their pretrained models and comprehensive documentation made this project possible.</sub>
-</td>
-<td align="center" width="50%">
-<img src="md%20imgs/thanks%20sein-pr.png" width="120" style="border-radius: 50%;" alt="Sein Muwana"/><br />
-<b><a href="https://github.com/sein-pr">Sein Muwana</a></b><br/>
-<sub>For meticulously preparing, cleaning, and annotating the mask detection dataset available on <a href="https://www.kaggle.com/datasets/muwanasein/bestset">Kaggle</a>. The quality of this dataset was crucial for model training.</sub>
-</td>
-</tr>
-</table>
-
-### ☁️ Infrastructure & Resources
-
-- **[Back4App](https://www.back4app.com/)** - For providing an excellent cloud deployment platform with seamless Flask integration and automatic HTTPS support, making the app accessible worldwide.
-
-- **[Kaggle](https://www.kaggle.com/)** - For providing free GPU resources through Kaggle Notebooks and KaggleHub, enabling us to train our model efficiently without expensive hardware. Their platform democratizes AI development.
-
-### 🛠️ Technologies
-
-- **[Flask](https://flask.palletsprojects.com/)** - Web framework powering the backend
-- **[OpenCV](https://opencv.org/)** - Computer vision library for image processing
-- **[WebRTC](https://webrtc.org/)** - Browser camera API for real-time video capture
-
-</div>
-
----
-
-## ⭐ Show Your Support
-
-If you find this project useful, please consider:
-- ⭐ Starring the repository
-- 🐛 Reporting bugs
-- 💡 Suggesting features
-- 🔗 Sharing with others
-
----
-
-**Stay Safe! Wear Your Mask! 😷**
-
+**Made with ❤️ using Flask and YOLO**

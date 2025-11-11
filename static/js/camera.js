@@ -12,6 +12,20 @@ class CameraHandler {
 
     async start() {
         try {
+            // Check if camera is supported
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Camera not supported in this browser');
+            }
+
+            // Check if HTTPS is required (not localhost)
+            const isLocalhost = window.location.hostname === 'localhost' || 
+                              window.location.hostname === '127.0.0.1' ||
+                              window.location.hostname === '[::1]';
+            
+            if (!isLocalhost && window.location.protocol !== 'https:') {
+                throw new Error('HTTPS_REQUIRED');
+            }
+
             // Request camera access with mobile-friendly constraints
             const constraints = {
                 video: {
@@ -38,7 +52,19 @@ class CameraHandler {
             });
         } catch (error) {
             console.error('Error accessing camera:', error);
-            throw error;
+            
+            // Provide specific error messages
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                throw new Error('Camera permission denied. Please allow camera access in your browser settings.');
+            } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                throw new Error('No camera found on this device.');
+            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                throw new Error('Camera is already in use by another application.');
+            } else if (error.message === 'HTTPS_REQUIRED') {
+                throw new Error('HTTPS_REQUIRED');
+            } else {
+                throw error;
+            }
         }
     }
 

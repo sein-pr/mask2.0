@@ -207,7 +207,24 @@ async function initializeCamera() {
 }
 
 function showCameraError(message) {
-    cameraErrorText.textContent = message;
+    // Check if it's an HTTPS error
+    if (message === 'HTTPS_REQUIRED') {
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        const httpsUrl = `https://${hostname}${port ? ':' + port : ''}/live`;
+        
+        cameraErrorText.innerHTML = `
+            <strong>HTTPS Required</strong><br><br>
+            Camera access requires HTTPS when accessing from other devices.<br><br>
+            <strong>Solutions:</strong><br>
+            1. Access via localhost on this device<br>
+            2. Set up HTTPS with SSL certificate<br>
+            3. Use ngrok or similar tunneling service<br><br>
+            <small>This is a browser security requirement.</small>
+        `;
+    } else {
+        cameraErrorText.textContent = message;
+    }
     cameraErrorOverlay.style.display = 'flex';
 }
 
